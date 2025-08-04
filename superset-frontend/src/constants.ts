@@ -165,11 +165,11 @@ export const DEFAULT_COMMON_BOOTSTRAP_DATA: CommonBootstrapData = {
   menu_data: {
     menu: [],
     brand: {
-      path: '',
-      icon: '',
-      alt: '',
-      tooltip: '',
-      text: '',
+      path: 'https://cop-image-settings.s3.us-east-1.amazonaws.com/logo-fincop.png',
+      icon: 'https://cop-image-settings.s3.us-east-1.amazonaws.com/logo-fincop.png',
+      alt: 'COP',
+      tooltip: 'COP',
+      text: 'COP',
     },
     navbar_right: {
       show_watermark: true,
