@@ -421,7 +421,8 @@ class Superset(BaseSupersetView):
                     )
             except (ChartNotFoundError, ExplorePermalinkGetFailedError) as ex:
                 flash(__("Error: %(msg)s", msg=ex.message), "danger")
-                return redirect("/chart/list/")
+                public_url_prefix = appbuilder.app.config["PUBLIC_URL_PREFIX"]
+                return redirect("{public_url_prefix}/chart/list/")
         elif form_data_key:
             parameters = CommandParameters(key=form_data_key)
             value = GetFormDataCommand(parameters).run()
@@ -829,18 +830,19 @@ class Superset(BaseSupersetView):
         self,
         key: str,
     ) -> FlaskResponse:
+        public_url_prefix = appbuilder.app.config["PUBLIC_URL_PREFIX"]
         try:
             value = GetDashboardPermalinkCommand(key).run()
         except DashboardPermalinkGetFailedError as ex:
             flash(__("Error: %(msg)s", msg=ex.message), "danger")
-            return redirect("/dashboard/list/")
+            return redirect("{public_url_prefix}/dashboard/list/")
         except DashboardAccessDeniedError as ex:
             flash(__("Error: %(msg)s", msg=ex.message), "danger")
-            return redirect("/dashboard/list/")
+            return redirect("{public_url_prefix}/dashboard/list/")
         if not value:
             return json_error_response(_("permalink state not found"), status=404)
         dashboard_id, state = value["dashboardId"], value.get("state", {})
-        url = f"/superset/dashboard/{dashboard_id}?permalink_key={key}"
+        url = f"{public_url_prefix}/superset/dashboard/{dashboard_id}?permalink_key={key}"
         if url_params := state.get("urlParams"):
             params = parse.urlencode(url_params)
             url = f"{url}&{params}"
@@ -921,4 +923,5 @@ class Superset(BaseSupersetView):
     @expose("/sqllab/history/", methods=("GET",))
     @deprecated(new_target="/sqllab/history")
     def sqllab_history(self) -> FlaskResponse:
-        return redirect("/sqllab/history")
+        public_url_prefix = appbuilder.app.config["PUBLIC_URL_PREFIX"]
+        return redirect("{public_url_prefix}/sqllab/history")

@@ -22,6 +22,7 @@ from typing import Optional
 from flask import Flask
 
 from superset.initialization import SupersetAppInitializer
+from superset.custom_session_interface import CustomSessionInterface
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +39,9 @@ def create_app(superset_config_module: Optional[str] = None) -> Flask:
 
         app_initializer = app.config.get("APP_INITIALIZER", SupersetAppInitializer)(app)
         app_initializer.init_app()
+
+        # Set the custom session interface
+        app.session_interface = CustomSessionInterface()
 
         return app
 

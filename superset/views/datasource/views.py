@@ -56,7 +56,7 @@ from superset.views.datasource.schemas import (
 from superset.views.datasource.utils import get_samples
 from superset.views.error_handling import handle_api_exception
 from superset.views.utils import sanitize_datasource_data
-
+from superset import appbuilder
 
 class Datasource(BaseSupersetView):
     """Datasource-related views"""
@@ -229,4 +229,5 @@ class DatasetEditor(BaseSupersetView):
         dev = request.args.get("testing")
         if dev is not None:
             return super().render_app_template()
-        return redirect("/")
+        public_url_prefix = appbuilder.app.config["PUBLIC_URL_PREFIX"]
+        return redirect("/{public_url_prefix}")
