@@ -22,7 +22,7 @@ set -e
 #
 /app/docker/docker-bootstrap.sh
 
-STEP_CNT=4
+STEP_CNT=6
 
 echo_step() {
 cat <<EOF
@@ -38,6 +38,7 @@ Init Step ${1}/${STEP_CNT} [${2}] -- ${3}
 EOF
 }
 ADMIN_PASSWORD="${ADMIN_PASSWORD:-admin}"
+POWERUSER_PASSWORD="${POWERUSER_PASSWORD:-gimmepower}"
 # If Cypress run – overwrite the password for admin and export env variables
 if [ "$CYPRESS_CONFIG" == "true" ]; then
     ADMIN_PASSWORD="general"
@@ -52,21 +53,41 @@ echo_step "1" "Complete" "Applying DB migrations"
 
 # Create an admin user
 echo_step "2" "Starting" "Setting up admin user ( admin / $ADMIN_PASSWORD )"
-superset fab create-admin \
-              --username admin \
-              --firstname Superset \
-              --lastname Admin \
-              --email admin@superset.com \
-              --password "$ADMIN_PASSWORD"
+if superset fab list-users | grep -q "username:admin"; then
+  superset fab reset-password --username admin --password "$ADMIN_PASSWORD"
+else
+  superset fab create-admin \
+                --username admin \
+                --firstname Superset \
+                --lastname Admin \
+                --email admin@superset.com \
+                --password "$ADMIN_PASSWORD"
+fi
+
 echo_step "2" "Complete" "Setting up admin user"
 # Create default roles and permissions
 echo_step "3" "Starting" "Setting up roles and perms"
 superset init
+superset fab import-roles --path /app/assets/roles.json
 echo_step "3" "Complete" "Setting up roles and perms"
+
+echo_step "4" "Starting" "Create power user"
+if superset fab list-users | grep -q "username:poweruser"; then
+  superset fab reset-password --username poweruser --password "$POWERUSER_PASSWORD"
+else
+  superset fab create-user \
+                --username poweruser \
+                --role COPPoweruser \
+                --firstname Power \
+                --lastname User \
+                --email power@user.com \
+                --password "$POWERUSER_PASSWORD"
+fi
+echo_step "4" "Complete" "Create power user"
 
 if [ "$SUPERSET_LOAD_EXAMPLES" = "yes" ]; then
     # Load some data to play with
-    echo_step "4" "Starting" "Loading examples"
+    echo_step "5" "Starting" "Loading examples"
     # If Cypress run which consumes superset_test_config – load required data for tests
     if [ "$CYPRESS_CONFIG" == "true" ]; then
         superset load_test_users
@@ -74,5 +95,9 @@ if [ "$SUPERSET_LOAD_EXAMPLES" = "yes" ]; then
     else
         superset load_examples --force
     fi
-    echo_step "4" "Complete" "Loading examples"
+    echo_step "5" "Complete" "Loading examples"
 fi
+
+echo_step "6" "Starting" "Seeding COP"
+PYTHONUNBUFFERED=1 python /app/seed/cop.py
+echo_step "6" "Complete" "Seeding COP"
