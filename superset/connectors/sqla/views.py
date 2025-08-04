@@ -46,6 +46,7 @@ from superset.views.base import (
     SupersetModelView,
     YamlExportMixin,
 )
+from superset import appbuilder
 
 logger = logging.getLogger(__name__)
 
@@ -468,7 +469,8 @@ class TableModelView(  # pylint: disable=too-many-ancestors
         resp = super().edit(pk)
         if isinstance(resp, str):
             return resp
-        return redirect(f"/explore/?datasource_type=table&datasource_id={pk}")
+        public_url_prefix = appbuilder.app.config["PUBLIC_URL_PREFIX"]
+        return redirect(f"{public_url_prefix}/explore/?datasource_type=table&datasource_id={pk}")
 
     @expose("/list/")
     @has_access

@@ -396,10 +396,11 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
             category_label=__("Manage"),
         )
 
+        public_url_prefix = appbuilder.app.config["PUBLIC_URL_PREFIX"]
         appbuilder.add_view(
             RowLevelSecurityView,
             "Row Level Security",
-            href="/rowlevelsecurity/list/",
+            href="{public_url_prefix}/rowlevelsecurity/list/",
             label=__("Row Level Security"),
             category="Security",
             category_label=__("Security"),
@@ -698,4 +699,4 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
 class SupersetIndexView(IndexView):
     @expose("/")
     def index(self) -> FlaskResponse:
-        return redirect("/superset/welcome/")
+        return redirect(appbuilder.app.config["LOGO_TARGET_PATH"])

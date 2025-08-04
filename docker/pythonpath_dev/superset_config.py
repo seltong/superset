@@ -22,6 +22,7 @@
 #
 import logging
 import os
+from urllib.parse import quote_plus
 
 from celery.schedules import crontab
 from flask_caching.backends.filesystemcache import FileSystemCache
@@ -29,11 +30,11 @@ from flask_caching.backends.filesystemcache import FileSystemCache
 logger = logging.getLogger()
 
 DATABASE_DIALECT = os.getenv("DATABASE_DIALECT")
-DATABASE_USER = os.getenv("DATABASE_USER")
-DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
+DATABASE_USER = quote_plus(os.getenv("DATABASE_USER"))
+DATABASE_PASSWORD = quote_plus(os.getenv("DATABASE_PASSWORD"))
 DATABASE_HOST = os.getenv("DATABASE_HOST")
 DATABASE_PORT = os.getenv("DATABASE_PORT")
-DATABASE_DB = os.getenv("DATABASE_DB")
+DATABASE_DB = quote_plus(os.getenv("DATABASE_DB"))
 
 EXAMPLES_USER = os.getenv("EXAMPLES_USER")
 EXAMPLES_PASSWORD = os.getenv("EXAMPLES_PASSWORD")
@@ -71,6 +72,7 @@ CACHE_CONFIG = {
 }
 DATA_CACHE_CONFIG = CACHE_CONFIG
 
+SCARF_ANALYTICS=False
 
 class CeleryConfig:
     broker_url = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_CELERY_DB}"
@@ -94,15 +96,31 @@ class CeleryConfig:
         },
     }
 
+# Flask-WTF flag for CSRF
+WTF_CSRF_ENABLED = False
+# Add endpoints that need to be exempt from CSRF protection (restrict for production)
+WTF_CSRF_EXEMPT_LIST = ['*']
+
 
 CELERY_CONFIG = CeleryConfig
 
-FEATURE_FLAGS = {"ALERT_REPORTS": True}
+FEATURE_FLAGS = {"ALERT_REPORTS": True, "EMBEDDED_SUPERSET": True}
 ALERT_REPORTS_NOTIFICATION_DRY_RUN = True
-WEBDRIVER_BASEURL = "http://superset:8088/"  # When using docker compose baseurl should be http://superset_app:8088/
+WEBDRIVER_BASEURL = os.getenv("SUPERSET_WEBDRIVER_BASEURL", "http://superset:8088/")  # When using docker compose baseurl should be http://superset_app:8088/
 # The base URL for the email report hyperlinks.
 WEBDRIVER_BASEURL_USER_FRIENDLY = WEBDRIVER_BASEURL
 SQLLAB_CTAS_NO_LIMIT = True
+
+# Only uncomment the following block to make localhost embed possible
+OVERRIDE_HTTP_HEADERS = {'X-Frame-Options': 'ALLOWALL'}
+TALISMAN_ENABLED = False
+ENABLE_CORS = True
+HTTP_HEADERS={"X-Frame-Options":"ALLOWALL"}
+
+# A list of resources (such as Dashboard) can be associated with the guest token, 
+# for some reason the default role value for GUEST_ROLE_NAME has to be changed from 'Public'.
+# The permitted resources seem to be calculated similar to a Venn intersection
+GUEST_ROLE_NAME= 'COPGuestuser'
 
 #
 # Optionally import superset_config_docker.py (which will have been included on
@@ -117,3 +135,28 @@ try:
     )
 except ImportError:
     logger.info("Using default Docker config...")
+
+EXTRA_CATEGORICAL_COLOR_SCHEMES = [
+    {
+        "id": "copBase",
+        "description": "",
+        "label": "COP colors",
+        "isDefault": True,
+        "colors": [
+            "#0F3B99",  # Dark Blue (Strong contrast)
+            "#A1D6FC",   # Light Blue (Less Dominant at End)
+            "#FFC508",  # Yellow (Bright & Distinct)
+            "#FF9705",  # Orange (Avoids Yellow Clashing)
+            "#38CDC2",  # Teal (Breaks Warm Sequence)
+            "#5886E9"   # Medium Blue (Keeps Cool-Warm Alternation)
+        ]
+    }
+]
+
+ENV = os.getenv("SUPERSET_ENV", "development")
+if ENV == "production":
+    PUBLIC_URL_PREFIX = '/cop-analytics'
+    LOGO_TARGET_PATH = '/cop-analytics/superset/welcome'
+    STATIC_ASSETS_PREFIX= '/cop-analytics'
+FAVICONS = [{"href": "https://cop-image-settings.s3.us-east-1.amazonaws.com/logo-fincop.png"}]
+APP_NAME = "COP Analytics"

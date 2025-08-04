@@ -22,11 +22,13 @@
 # unique random secure passwords and SECRET_KEY.
 # -----------------------------------------------------------------------
 x-superset-depends-on: &superset-depends-on
-  - db
+  #- db
   - redis
 x-superset-volumes:
   &superset-volumes # /app/pythonpath_docker will be appended to the PYTHONPATH in the final container
   - ./docker:/app/docker
+  - ./assets:/app/assets
+  - ./seed:/app/seed
   - superset_home:/app/superset_home
 
 x-common-build: &common-build
@@ -43,18 +45,17 @@ services:
     volumes:
       - redis:/data
 
-  db:
-    env_file:
-      - path: docker/.env # default
-        required: true
-      - path: docker/.env-local # optional override
-        required: false
-    image: postgres:15
-    container_name: superset_db
-    restart: unless-stopped
-    volumes:
-      - db_home:/var/lib/postgresql/data
-      - ./docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+  # db:
+  #   env_file:
+  #     - path: docker/.env # default
+  #       required: true
+  #     - path: docker/.env-local # optional override
+  #       required: false
+  #   container_name: superset_postgres
+  #   image: 'postgres:14.4'
+  #   restart: unless-stopped
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
 
   superset:
     env_file:
@@ -130,7 +131,7 @@ services:
 volumes:
   superset_home:
     external: false
-  db_home:
-    external: false
+  # db_home:
+  #   external: false
   redis:
     external: false

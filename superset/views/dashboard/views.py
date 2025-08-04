@@ -44,7 +44,7 @@ from superset.views.base import (
     SupersetModelView,
 )
 from superset.views.dashboard.mixin import DashboardMixin
-
+from superset import appbuilder
 
 class DashboardModelView(DashboardMixin, SupersetModelView, DeleteMixin):  # pylint: disable=too-many-ancestors
     route_base = "/dashboard"
@@ -88,7 +88,8 @@ class DashboardModelView(DashboardMixin, SupersetModelView, DeleteMixin):  # pyl
         if not isinstance(items, list):
             items = [items]
         ids = "".join(f"&id={d.id}" for d in items)
-        return redirect(f"/dashboard/export_dashboards_form?{ids[1:]}")
+        public_url_prefix = appbuilder.app.config["PUBLIC_URL_PREFIX"]
+        return redirect(f"{public_url_prefix}/dashboard/export_dashboards_form?{ids[1:]}")
 
     @event_logger.log_this
     @has_access
@@ -123,7 +124,8 @@ class Dashboard(BaseSupersetView):
         )
         db.session.add(new_dashboard)
         db.session.commit()  # pylint: disable=consider-using-transaction
-        return redirect(f"/superset/dashboard/{new_dashboard.id}/?edit=true")
+        public_url_prefix = appbuilder.app.config["PUBLIC_URL_PREFIX"]
+        return redirect(f"{public_url_prefix}/superset/dashboard/{new_dashboard.id}/?edit=true")
 
     @expose("/<dashboard_id_or_slug>/embedded")
     @event_logger.log_this_with_extra_payload
