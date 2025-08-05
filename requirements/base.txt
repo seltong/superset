@@ -117,6 +117,8 @@ flask-caching==2.3.0
     # via apache-superset
 flask-compress==1.15
     # via apache-superset
+flask-cors==4.0.0
+    # via apache-superset
 flask-jwt-extended==4.6.0
     # via flask-appbuilder
 flask-limiter==3.7.0
@@ -255,6 +257,11 @@ parsedatetime==2.6
     # via apache-superset
 pgsanity==0.2.9
     # via apache-superset
+pillow==10.3.0
+    # via
+    #   apache-superset
+    #   matplotlib
+pyppeteer==2.0.0
 platformdirs==3.8.1
     # via requests-cache
 ply==3.11
