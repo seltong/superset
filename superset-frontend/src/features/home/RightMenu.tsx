@@ -65,9 +65,6 @@ const versionInfoStyles = (theme: SupersetTheme) => css`
   font-size: ${theme.typography.sizes.xs}px;
   white-space: nowrap;
 `;
-const StyledI = styled.div`
-  color: ${({ theme }) => theme.colors.primary.dark1};
-`;
 
 const styledDisabled = (theme: SupersetTheme) => css`
   color: ${theme.colors.grayscale.light1};
@@ -412,9 +409,7 @@ const RightMenu = ({
         {!navbarRight.user_is_anonymous && showActionDropdown && (
           <SubMenu
             data-test="new-dropdown"
-            title={
-              <StyledI data-test="new-dropdown-icon" className="fa fa-plus" />
-            }
+            title={t('Database Connections')}
             icon={<Icons.TriangleDown />}
           >
             {dropdownItems?.map?.(menu => {
