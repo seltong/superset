@@ -80,8 +80,31 @@ const StyledDiv = styled.div<{ align: string }>`
   justify-content: ${({ align }) => align};
   align-items: center;
   margin-right: ${({ theme }) => theme.gridUnit}px;
+
+  .ant-menu-horizontal {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-evenly;
+    flex-direction: row;
+  }
+
+  .ant-menu-horizontal > .ant-menu-submenu {
+    height: ${({ theme }) => theme.gridUnit * 12}px;
+    display: flex;
+    align-items: center;
+  }
+
+  .ant-menu-submenu-title {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    gap: 4px;
+  }
+
   .ant-menu-submenu-title > svg {
     top: ${({ theme }) => theme.gridUnit * 5.25}px;
+    height: 100%;
   }
 `;
 
@@ -409,8 +432,26 @@ const RightMenu = ({
         {!navbarRight.user_is_anonymous && showActionDropdown && (
           <SubMenu
             data-test="new-dropdown"
-            title={t('Database Connections')}
-            icon={<Icons.TriangleDown />}
+            title=""
+            icon={
+              <>
+                <Icons.PlusLarge
+                  css={{
+                    width: `${theme.gridUnit * 15}px`,
+                    '& svg': {
+                      color: `${theme.colors.primary.base} !important`,
+                    },
+                  }}
+                />
+                <Icons.TriangleDown
+                  css={{
+                    '& svg': {
+                      color: `${theme.colors.primary.base} !important`,
+                    },
+                  }}
+                />
+              </>
+            }
           >
             {dropdownItems?.map?.(menu => {
               const canShowChild = menu.childs?.some(
