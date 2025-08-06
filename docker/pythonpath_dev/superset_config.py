@@ -127,7 +127,6 @@ GUEST_ROLE_NAME= 'COPGuestuser'
 # the PYTHONPATH) in order to allow for local settings to be overridden
 #
 try:
-    import superset_config_docker
     from superset_config_docker import *  # noqa
 
     logger.info(
@@ -153,13 +152,18 @@ EXTRA_CATEGORICAL_COLOR_SCHEMES = [
     }
 ]
 
-ENV = os.getenv("SUPERSET_ENV", "development")
 
-if ENV == "production":
-    PUBLIC_URL_PREFIX = '/cop-analytics'
-    # Configuração para assets e navegação
-    LOGO_TARGET_PATH = '/cop-analytics/welcome'
-    STATIC_ASSETS_PREFIX = '/cop-analytics'
+# Configuração do prefixo de URL para todas as rotas
+APPLICATION_ROOT = '/cop-analytics'
+PUBLIC_URL_PREFIX = '/cop-analytics'
+
+# Configuração para assets e navegação
+LOGO_TARGET_PATH = '/superset/welcome/'
+STATIC_ASSETS_PREFIX = '/cop-analytics'
+
+# Atualizar WEBDRIVER_BASEURL para incluir o prefixo
+WEBDRIVER_BASEURL = os.getenv("SUPERSET_WEBDRIVER_BASEURL", "http://superset:8088/cop-analytics/")
+WEBDRIVER_BASEURL_USER_FRIENDLY = WEBDRIVER_BASEURL
 
 FAVICONS = [{"href": "https://cop-image-settings.s3.us-east-1.amazonaws.com/logo-fincop.png"}]
 APP_NAME = "COP Analytics"
