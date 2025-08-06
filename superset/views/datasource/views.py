@@ -230,4 +230,4 @@ class DatasetEditor(BaseSupersetView):
         if dev is not None:
             return super().render_app_template()
         public_url_prefix = appbuilder.app.config["PUBLIC_URL_PREFIX"]
-        return redirect("/{public_url_prefix}")
+        return redirect(f"/{public_url_prefix}")

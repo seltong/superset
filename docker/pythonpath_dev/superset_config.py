@@ -154,9 +154,12 @@ EXTRA_CATEGORICAL_COLOR_SCHEMES = [
 ]
 
 ENV = os.getenv("SUPERSET_ENV", "development")
+
 if ENV == "production":
     PUBLIC_URL_PREFIX = '/cop-analytics'
+    # Configuração para assets e navegação
     LOGO_TARGET_PATH = '/cop-analytics/superset/welcome'
-    STATIC_ASSETS_PREFIX= '/cop-analytics'
+    STATIC_ASSETS_PREFIX = '/cop-analytics'
+
 FAVICONS = [{"href": "https://cop-image-settings.s3.us-east-1.amazonaws.com/logo-fincop.png"}]
 APP_NAME = "COP Analytics"

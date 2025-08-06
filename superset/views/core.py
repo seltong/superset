@@ -422,7 +422,7 @@ class Superset(BaseSupersetView):
             except (ChartNotFoundError, ExplorePermalinkGetFailedError) as ex:
                 flash(__("Error: %(msg)s", msg=ex.message), "danger")
                 public_url_prefix = appbuilder.app.config["PUBLIC_URL_PREFIX"]
-                return redirect("{public_url_prefix}/chart/list/")
+                return redirect(f"{public_url_prefix}/chart/list/")
         elif form_data_key:
             parameters = CommandParameters(key=form_data_key)
             value = GetFormDataCommand(parameters).run()
@@ -835,10 +835,10 @@ class Superset(BaseSupersetView):
             value = GetDashboardPermalinkCommand(key).run()
         except DashboardPermalinkGetFailedError as ex:
             flash(__("Error: %(msg)s", msg=ex.message), "danger")
-            return redirect("{public_url_prefix}/dashboard/list/")
+            return redirect(f"{public_url_prefix}/dashboard/list/")
         except DashboardAccessDeniedError as ex:
             flash(__("Error: %(msg)s", msg=ex.message), "danger")
-            return redirect("{public_url_prefix}/dashboard/list/")
+            return redirect(f"{public_url_prefix}/dashboard/list/")
         if not value:
             return json_error_response(_("permalink state not found"), status=404)
         dashboard_id, state = value["dashboardId"], value.get("state", {})
@@ -924,4 +924,4 @@ class Superset(BaseSupersetView):
     @deprecated(new_target="/sqllab/history")
     def sqllab_history(self) -> FlaskResponse:
         public_url_prefix = appbuilder.app.config["PUBLIC_URL_PREFIX"]
-        return redirect("{public_url_prefix}/sqllab/history")
+        return redirect(f"{public_url_prefix}/sqllab/history")
